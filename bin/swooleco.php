@@ -24,7 +24,7 @@ Swoole\Coroutine\run(function () {
         Swoole\Process::signal($signal, function () use ($server) {
             Logger::instance()->info('Shutdown swoole coroutine server');
             $server->shutdown();
-            SUB::instance(0)->closeAll();
+            SUB::instance()->closeAll();
             Upgrader::instance()->closeAll();
         });
     }

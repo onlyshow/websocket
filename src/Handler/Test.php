@@ -8,6 +8,6 @@ class Test extends Contract\BaseHandler
 {
     public function all()
     {
-        var_dump(SUB::instance($this->session->getUserId())->getConnections());
+        var_dump(SUB::instance()->getConnections());
     }
 }

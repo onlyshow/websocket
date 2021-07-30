@@ -12,32 +12,13 @@ trait SubscriberManager
     protected $connections = [];
 
     /**
-     * @var string
-     */
-    protected string $userId;
-
-    public function __construct(string $userId)
-    {
-        $this->userId = $userId;
-    }
-
-    /**
      * 新增连接
      * @param Subscriber $connection
      */
     public function add(Subscriber $connection)
     {
-        $id = $this->userId;
+        $id = spl_object_id($connection);
         $this->connections[$id] = $connection;
-    }
-
-    /**
-     * @return Subscriber|null
-     */
-    public function get(): ?Subscriber
-    {
-        $id = $this->userId;
-        return $this->connections[$id] ?? null;
     }
 
     /**
@@ -45,9 +26,9 @@ trait SubscriberManager
      * 这里不可关闭连接，因为这个方法是在关闭连接中调用的
      * @param Subscriber $connection
      */
-    public function remove()
+    public function remove(Subscriber $connection)
     {
-        $id = $this->userId;
+        $id = spl_object_id($connection);
         if (!isset($this->connections[$id])) {
             return;
         }
@@ -55,12 +36,13 @@ trait SubscriberManager
     }
 
     /**
-     * 计数
-     * @return int
+     * @param Subscriber $connection
+     * @throws \Swoole\Exception
      */
-    public function count(): int
+    public function close(Subscriber $connection)
     {
-        return count($this->connections);
+        $connection->close();
+        $this->remove($connection);
     }
 
     /**
@@ -73,6 +55,15 @@ trait SubscriberManager
             $connection->close();
             $this->remove($connection);
         }
+    }
+
+    /**
+     * 计数
+     * @return int
+     */
+    public function count(): int
+    {
+        return count($this->connections);
     }
 
     /**

@@ -3,14 +3,13 @@
 namespace App\Service;
 
 use App\Container\Logger;
-use App\Handler\Contract\BaseHandler;
-use App\Handler\User;
+use App\Container\SUB;
 use Mix\WebSocket\Connection;
 use Swoole\Coroutine\Channel;
 
 class Session
 {
-    use UserAuth;
+    use UserAuth, SubscriberTrait;
 
     /**
      * @var Connection
@@ -110,6 +109,7 @@ class Session
     public function stop()
     {
         $this->writeChan->close();
+        SUB::instance()->close($this->getSubscriber());
     }
 
 }
